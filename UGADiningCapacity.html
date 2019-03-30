@@ -8,6 +8,7 @@
 	
 	
 	<script src="https://www.gstatic.com/firebasejs/5.9.2/firebase.js"></script>
+	<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
 	<script>
 	  // This needs to happen before everything else
 	  // Initialize Firebase
@@ -20,20 +21,34 @@
 	    messagingSenderId: "924352123328"
 	  };
 	  firebase.initializeApp(config);
+
+	var database = firebase.database();
+		
+	// This displays the graph of current capacity percentages
+	Function graphPercentages() {
+	 var currentCap = new CanvasJS.Chart("chartContainer", {
+	  title:{
+	   text: "Current Capacity Percentages"              
+	  },
+	  data: [{
+	   // Change type to "doughnut", "line", "splineArea", etc.
+	   type: "column",
+	   dataPoints: [
+	   { label: "Bolton",  y: 27  },
+	   { label: "O-House", y: 0  },
+	   { label: "Snelling", y: 0  },
+	   { label: "Joe Frank",  y: 25  },
+	   { label: "The Niche",  y: 0  }
+	   ]
+	  }
+	  ]});
+	 chart.render();
+	}
 	</script>
-	
-	<script>
-		// This displays the graph of current capacity percentages
-		Function graphPercentages() {
- 	 		var currentData = [{
-    			DiningHalls: ["Bolton", "O-House", "Snelling", "Village Summit", "The Niche"],
-    			CapacityPercentages: [27, 0, 0, 25, 0], // !!!Needs to be updated to take most recent data from UGA dining server!!!
-    			type: 'bar'}];
-  
-  			Plotly.newPlot('Current Capacities', currentData);
-		}
-	</script>
+
 	<body>
-	
+	 <script>
+	  graphPercentages();
+	 </script>
 	</body>
 </html>
