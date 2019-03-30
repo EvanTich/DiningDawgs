@@ -22,6 +22,17 @@
 	  firebase.initializeApp(config);
 	</script>
 	
+	<script>
+		// This displays the graph of current capacity percentages
+		Function graphPercentages() {
+ 	 		var currentData = [{
+    			DiningHalls: ["Bolton", "O-House", "Snelling", "Village Summit", "The Niche"],
+    			CapacityPercentages: [27, 0, 0, 25, 0], // !!!Needs to be updated to take most recent data from UGA dining server!!!
+    			type: 'bar'}];
+  
+  			Plotly.newPlot('Current Capacities', currentData);
+		}
+	</script>
 	<body>
 	
 	</body>
