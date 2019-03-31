@@ -10,6 +10,8 @@
 
         <script type="text/javascript">
         
+            var lineChart;
+        
             function Get(yourUrl){
                 var Httpreq = new XMLHttpRequest(); // a new request
                 Httpreq.open("GET",yourUrl,false);
@@ -62,7 +64,7 @@
                     ]
                 });
                 chart.render();
-                var lineChart = new CanvasJS.Chart("lineChartContainer", {
+                lineChart = new CanvasJS.Chart("lineChartContainer", {
                     title:{
                         text: "Past Traffic"              
                     },
@@ -99,8 +101,7 @@
                     
                     // do stuff with arr
                     for(int i = 0; i < arr.length; i++) {
-                        lineChart.data[0].addTo("dataPoints", {x: arr[i].x, y: arr[i].y})
-                        }); 
+                        lineChart.data[0].addTo("dataPoints", {x: arr[i].x, y: arr[i].y}) 
                     }
                     lineChart.render();
                 }
