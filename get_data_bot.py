@@ -16,4 +16,9 @@ def update_data():
         requests.patch(do_page, headers=headers, data=json.dumps(arr))
     return 'it\'s good!'
         
-update_data()
+
+SLEEP_TIME = 5 * 60
+while True:
+    update_data()
+    print("|")
+    time.sleep(SLEEP_TIME)
