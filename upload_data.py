@@ -23,4 +23,4 @@ for log in logs:
 print(data)
         
 headers = {'Content-type': 'application/json'}
-requests.put('https://dining-capacity.firebaseio.com/data.json', headers=headers, data=json.dumps(data))
+requests.put('https://dining-capacity.firebaseio.com/rest/dining-capacity.json', headers=headers, data=json.dumps(data))
