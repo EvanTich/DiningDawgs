@@ -1,0 +1,110 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <link src="dining.css" type="text/css">
+        <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+
+        <script type="text/javascript">
+
+
+            window.onload = function () {
+                
+                var yourUrl="https://dining-capacity.firebaseio.com/data/ohouse.json";
+                function Get(yourUrl){
+                    var Httpreq = new XMLHttpRequest(); // a new request
+                    Httpreq.open("GET",yourUrl,false);
+                    Httpreq.send(null);
+                    return Httpreq.responseText;          
+                }
+                var that="1550941534";
+
+                var json_objOhouse = JSON.parse(Get(yourUrl));
+                console.log("this is the author name: "+json_objOhouse[that]);
+
+                var keySetOhouse = Object.keys(json_objOhouse);
+                
+                var mostRecentTimeOhouse = keySetOhouse.length-1;
+                
+                var yourUrl="https://dining-capacity.firebaseio.com/data/bolton.json";
+                function Get(yourUrl){
+                    var Httpreq = new XMLHttpRequest(); // a new request
+                    Httpreq.open("GET",yourUrl,false);
+                    Httpreq.send(null);
+                    return Httpreq.responseText;          
+                }
+                var that="1550941534";
+
+                var json_objBolton = JSON.parse(Get(yourUrl));
+                console.log("this is the author name: "+json_objBolton[that]);
+
+                var keySetBolton = Object.keys(json_objBolton);
+                
+                var mostRecentTimeBolton = keySetBolton.length-1;
+                
+                console.log(mostRecentTimeOhouse);
+                var chart = new CanvasJS.Chart("chartContainer", {
+                    title:{
+                        text: "Current Capacity"              
+                    },
+                    data: [              
+                        {
+                            // Change type to "doughnut", "line", "splineArea", etc.
+                            type: "stackedColumn100",
+                            dataPoints: [
+                                { label: "O-House", y: keySetBolton.indexOf(mostRecentTimeOhouse)},
+                                { label: "Bolton", y: json_objBolton}
+                            ]
+                        },
+                        {
+                            type: "stackedColumn100",
+                            dataPoints: [
+                                {
+                                    label: "O-House", y: (100)
+                                },
+                                { label: "Bolton", y: }
+                            ]
+                        }
+                    ]
+                });
+                chart.render();
+            }
+        </script>
+    </head>
+    <body>
+        <div class="container">
+            <h2>Dynamic Tabs</h2>
+            <p>To make the tabs toggleable, add the data-toggle="tab" attribute to each link. Then add a .tab-pane class with a unique ID for every tab and wrap them inside a div element with class .tab-content.</p>
+
+            <ul class="nav nav-tabs">
+                <li class="active"><a data-toggle="tab" href="#home">Current Capacity</a></li>
+                <li><a data-toggle="tab" href="#menu1">Menu 1</a></li>
+                <li><a data-toggle="tab" href="#menu2">Menu 2</a></li>
+                <li><a data-toggle="tab" href="#menu3">Menu 3</a></li>
+            </ul>
+
+            <div class="tab-content">
+                <div id="home" class="tab-pane fade in active">
+                    <p>Current</p>
+                </div>
+                <div id="menu1" class="tab-pane fade">
+                    <h3>Menu 1</h3>
+                    <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                </div>
+                <div id="menu2" class="tab-pane fade">
+
+                    <h3>Menu 2</h3>
+                    <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam.</p>
+
+                </div>
+                <div id="menu3" class="tab-pane fade">
+
+                    <div id="chartContainer"></div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

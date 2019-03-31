@@ -1,0 +1,29 @@
+<html>
+    <head>
+
+    </head>
+    <body>
+        <script>
+            function getJSON(url) {
+                var resp ;
+                var xmlHttp ;
+
+                resp  = '' ;
+                xmlHttp = new XMLHttpRequest();
+
+                if(xmlHttp != null)
+                {
+                    xmlHttp.open( "GET", url, false );
+                    xmlHttp.send( null );
+                    resp = xmlHttp.responseText;
+                }
+
+                return resp ;
+            }
+            var gjson;
+            gjson = getJSON('https://dining-capacity.firebaseio.com/data/bolton/2019/08/Friday.json');
+            console.log(gjson);
+        </script>
+
+    </body>
+</html>
