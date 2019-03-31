@@ -25,7 +25,7 @@
 	var database = firebase.database();
 		
 	// This displays the graph of current capacity percentages
-	Function graphPercentages() {
+	window.onload = graphPercentages() {
 	 var currentCap = new CanvasJS.Chart("chartContainer", {
 	  title:{
 	   text: "Current Capacity Percentages"              
@@ -41,12 +41,13 @@
 	   { label: "The Niche",  y: 0  }
 	   ]
 	  }
-	  ]});
+	  ]}});
 	 chart.render();
 	}
 	</script>
 
 	<body>
+	 <div id="chartContainer" style="height: 300px; width: 100%;"></div>
 	 <script>
 	  graphPercentages();
 	 </script>
