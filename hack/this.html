@@ -9,37 +9,18 @@
         <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 
         <script type="text/javascript">
-
+        
+            function Get(yourUrl){
+                var Httpreq = new XMLHttpRequest(); // a new request
+                Httpreq.open("GET",yourUrl,false);
+                Httpreq.send(null);
+                return Httpreq.responseText;          
+            }
 
             window.onload = function () {
-
-                var yourUrl="https://dining-capacity.firebaseio.com/data/ohouse.json";
-                function Get(yourUrl){
-                    var Httpreq = new XMLHttpRequest(); // a new request
-                    Httpreq.open("GET",yourUrl,false);
-                    Httpreq.send(null);
-                    return Httpreq.responseText;          
-                }
-                var that="1550941534";
-
-                var json_objOhouse = JSON.parse(Get(yourUrl));
-                console.log("this is the author name: "+json_objOhouse[that]);
-
-                var keySetOhouse = Object.keys(json_objOhouse);
-
-                var mostRecentTimeOhouse = keySetOhouse.length-1;
-
                 var yourUrl="https://dining-capacity.firebaseio.com/data/bolton.json";
-                function Get(yourUrl){
-                    var Httpreq = new XMLHttpRequest(); // a new request
-                    Httpreq.open("GET",yourUrl,false);
-                    Httpreq.send(null);
-                    return Httpreq.responseText;          
-                }
-                var that="1550941534";
 
                 var json_objBolton = JSON.parse(Get(yourUrl));
-                console.log("this is the author name: "+json_objBolton[that]);
 
                 var keySetBolton = Object.keys(json_objBolton);
 
@@ -98,10 +79,10 @@
                     ]
                 });
                 lineChart.render();
-                
-                function boo()={
+            }
+            
+            function boo(day) {
                     var url = "https://dining-capacity.firebaseio.com/data/bolton.json";
-                    var day = document.getElementById("selector").value;
                     var json_b = JSON.parse(Get(url));
                     var arr = [];
                     
@@ -115,15 +96,14 @@
                             arr.push({x: date, y: percent});
                         }
                     }
+                    
+                    // do stuff with arr
                     for(int i = 0; i < arr.length; i++) {
                         lineChart.data[0].addTo("dataPoints", {x: arr[i].x, y: arr[i].y})
                         }); 
                     }
                     lineChart.render();
-                    // do stuff with arr
-                    // basically a dataPoints array
                 }
-            }
         </script>
     </head>
     <body>
@@ -144,8 +124,8 @@
 
                     </div>
                     <div style="position: absolute; bottom:350pt;">
-                        <select id="selector">
-                            <option value="Sunday" onSubmit="boo()">Sunday</option>
+                        <select id="selector" onchange="boo(this.value)">
+                            <option value="Sunday">Sunday</option>
                             <option value="Monday">Monday</option>
                             <option value="Tuesday">Tuesday</option>
                             <option value="Wednesday">Wednesday</option>
