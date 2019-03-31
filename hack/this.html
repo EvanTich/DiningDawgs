@@ -106,6 +106,17 @@
                     ]
                 });
                 lineChart.render();
+                
+                function boo()={
+                    
+                    var day = document.getElementById("selector").;
+                    var json_b = JSON.parse(Get(yourUrl));
+                    var arr = [];
+                    
+                    for(var x : json_b) {
+                        
+                    }
+                }
             }
         </script>
     </head>
@@ -127,12 +138,15 @@
 
                     </div>
                     <div style="position: absolute; bottom:350pt;">
-                        
-                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" >
-                            <a class="dropdown-item" href="#">Action</a>
-                            <a class="dropdown-item" href="#">Another action</a>
-                            <a class="dropdown-item" href="#">Something else here</a>
-                        </div>
+                        <select id="selector">
+                            <option value="Sunday" onSubmit="boo()">Sunday</option>
+                            <option value="Monday">Monday</option>
+                            <option value="Tuesday">Tuesday</option>
+                            <option value="Wednesday">Wednesday</option>
+                            <option value="Thursday">Thursday</option>
+                            <option value="Friday">Friday</option>
+                            <option value="Sunday">Sunday</option>
+                        </select>
                     </div>
 
                 </div>
