@@ -1,5 +1,7 @@
 # UGADiningCapacity
 
+Github Pages link : https://jlc94087.github.io/UGADiningCapacity/
+
 ## How to access the database
 Use a call to `https://dining-capacity.firebaseio.com/data.json` to get all the data from the database.
 
