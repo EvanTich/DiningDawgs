@@ -108,14 +108,24 @@
                 lineChart.render();
                 
                 function boo()={
-                    
-                    var day = document.getElementById("selector").;
-                    var json_b = JSON.parse(Get(yourUrl));
+                    var url = "https://dining-capacity.firebaseio.com/data/bolton.json";
+                    var day = document.getElementById("selector").value;
+                    var json_b = JSON.parse(Get(url));
                     var arr = [];
                     
-                    for(var x : json_b) {
+                    for(var key : json_b.keys()) {
+                        var date = new Date(parseInt(key));
+                        var percent = json_b[key];
                         
+                        var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                        var dayName = days[date.getDay()];
+                        if(dayName == day) {
+                            arr.push({x: date, y: percent});
+                        }
                     }
+                    
+                    // do stuff with arr
+                    // basically a dataPoints array
                 }
             }
         </script>
