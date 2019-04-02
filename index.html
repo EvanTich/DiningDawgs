@@ -7,118 +7,7 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
         <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-
-        <script type="text/javascript">
-        
-            var lineChart;
-            var day;
-            var hall;
-        
-            function Get(yourUrl){
-                var Httpreq = new XMLHttpRequest(); // a new request
-                Httpreq.open("GET",yourUrl,false);
-                Httpreq.send(null);
-                return Httpreq.responseText;          
-            }
-
-            window.onload = function () {
-                day = "Sunday";
-                hall = "bolton";
-            
-                var halls = ["bolton", "ohouse", "snelling", "summit", "scott"];
-                var halls_pretty = ["Bolton", "O-House", "Snelling", "Joe Frank", "The Niche"];
-                
-                var arr_b = [];
-                var arr_r = [];
-                for(var i = 0; i < halls.length; i++) {
-                    var url = "https://dining-capacity.firebaseio.com/data/" + halls[i] + ".json?orderBy=\"$key\"&limitToLast=1";
-                    var stuff = JSON.parse(Get(url));
-                    
-                    var percent = stuff[Object.keys(stuff)[0]];
-                    
-                    arr_b.push({label: halls_pretty[i], y: percent});
-                    arr_r.push({label: halls_pretty[i], y: 100 - percent});
-                }
-            
-                var chart = new CanvasJS.Chart("chartContainer", {
-                    title:{
-                        text: "Current Capacity"              
-                    },
-                    axisY:{
-                        title: "Capacity(%)"
-                    },
-                    data: [              
-                        {
-                            // Change type to "doughnut", "line", "splineArea", etc.
-                            type: "stackedColumn100",
-                            dataPoints: arr_b
-                        },
-                        {
-                            // Change type to "doughnut", "line", "splineArea", etc.
-                            type: "stackedColumn100",
-                            dataPoints: arr_r
-                        }
-                    ]
-                });
-                chart.render();
-                lineChart = new CanvasJS.Chart("lineChartContainer", {
-                    title:{
-                        text: "Past Traffic"              
-                    },
-                    axisY:{
-                        title: "Capacity(%)"
-                    },
-                    data: [              
-                        {
-                            // Change type to "doughnut", "line", "splineArea", etc.
-                            type: "line",
-                            dataPoints: get_arr(day)
-
-                        }
-                    ]
-                });
-                lineChart.render();
-            }
-            
-            function get_arr(day) {
-                var url = "https://dining-capacity.firebaseio.com/data/" + hall + ".json";
-                var json_b = JSON.parse(Get(url));
-                var arr = [];
-                
-                var found = false;
-                var keys = Object.keys(json_b)
-                for(var i = 0; i < keys.length; i++) {
-                    var date = new Date(parseInt(keys[i]) * 1000);
-                    var percent = json_b[keys[i]];
-                    
-                    var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-                    var dayName = days[date.getDay()];
-                    if(dayName == day) {
-                        found = true;
-                        arr.push({x: date, y: percent});
-                    } else if (found) {
-                        break;
-                    }
-                }
-                return arr;
-            }
-            
-            function update() {
-                var arr = get_arr(day);
-                lineChart.data[0].set("dataPoints", arr);
-                lineChart.render();
-            }
-            
-            function boo(d) {
-                day = d;
-                update();
-            }
-            
-            function poo(h) {
-                hall = h;
-                update();
-            }
-        </script>
+        <script src="dining.js" type="text/javascript"></script>
     </head>
     <body>
         <div class="container">
@@ -134,28 +23,49 @@
                     <div id="chartContainer"></div>    
                 </div>
                 <div id="menu1" class="tab-pane fade">
-                    <div id="lineChartContainer">
-
-                    </div>
-                    <div style="position: absolute; bottom:350pt;">
-                        <select id="selector" onchange="boo(this.value)">
-                            <option value="Sunday">Sunday</option>
-                            <option value="Monday">Monday</option>
-                            <option value="Tuesday">Tuesday</option>
-                            <option value="Wednesday">Wednesday</option>
-                            <option value="Thursday">Thursday</option>
-                            <option value="Friday">Friday</option>
-                            <option value="Saturday">Saturday</option>
-                        </select>
-                    </div>
-                    <div style="position: absolute; bottom:375pt;">
-                        <select id="selector_hall" onchange="poo(this.value)">
-                            <option value="bolton">Bolton</option>
-                            <option value="snelling">Snelling</option>
-                            <option value="ohouse">O-House</option>
-                            <option value="summit">Joe Frank Harris</option>
-                            <option value="scott">The Niche</option>
-                        </select>
+                    <div id="lineChartContainer"></div>
+                    
+                    <div id="inputs">
+                        <h1 id="message"></h1>
+                        <div style="display: inline-block;">
+                            <select id="selector_hall" onchange="changed()">
+                                <option value="bolton">Bolton</option>
+                                <option value="snelling">Snelling</option>
+                                <option value="ohouse">O-House</option>
+                                <option value="summit">Joe Frank Harris</option>
+                                <option value="scott">The Niche</option>
+                            </select>
+                        </div>
+                        <div style="display: inline-block;">
+                            <input type="text" id="input_year" placeholder="Year">
+                        </div>
+                        <div style="display: inline-block;">
+                            <select id="selector_month" onchange="changed()">
+                                <option value="1">January</option>
+                                <option value="2">February</option>
+                                <option value="3">March</option>
+                                <option value="4">April</option>
+                                <option value="5">May</option>
+                                <option value="6">June</option>
+                                <option value="7">July</option>
+                                <option value="8">August</option>
+                                <option value="9">September</option>
+                                <option value="10">October</option>
+                                <option value="11">November</option>
+                                <option value="12">December</option>
+                            </select>
+                        </div>
+                        <div style="display: inline-block;">
+                            <select id="selector_day" onchange="changed()">
+                                <option value="6">Sunday</option>
+                                <option value="0">Monday</option> <!-- !! Monday IS 0 !! -->
+                                <option value="1">Tuesday</option>
+                                <option value="2">Wednesday</option>
+                                <option value="3">Thursday</option>
+                                <option value="4">Friday</option>
+                                <option value="5">Saturday</option>
+                            </select>
+                        </div>
                     </div>
 
                 </div>
