@@ -20,12 +20,12 @@ for log in logs:
         unix_time = int(float(unix_time))
         percent = int(percent.strip())
         
-        gmtime = time.gmtime(unix_time)
-        year = gmtime.tm_year
-        month = gmtime.tm_mon
-        day = gmtime.tm_mday
-        hour = gmtime.tm_hour
-        min = gmtime.tm_min
+        stuff = time.strftime('%Y/%m/%d/%H/%M', time.localtime(unix_time)).split('/')
+        year = stuff[0]
+        month = stuff[1]
+        day = stuff[2]
+        hour = stuff[3]
+        min = stuff[4]
         
         if not year in data[hall]:
             data[hall][year] = {}

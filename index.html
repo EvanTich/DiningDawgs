@@ -26,23 +26,23 @@
                     <div id="lineChartContainer"></div>
                     
                     <div id="inputs">
-                        <h1 id="message"></h1>
-                        <div style="display: inline-block;">
+                        <h1 id="message" style="position: absolute; bottom: 110px"></h1>
+                        <div style="position: absolute; bottom: 10px; display: inline-block;">
                             <select id="selector_hall" onchange="changed()">
-                                <option value="bolton">Bolton</option>
+                                <option value="bolton" selected="selected">Bolton</option>
                                 <option value="snelling">Snelling</option>
                                 <option value="ohouse">O-House</option>
                                 <option value="summit">Joe Frank Harris</option>
                                 <option value="scott">The Niche</option>
                             </select>
                         </div>
-                        <div style="display: inline-block;">
-                            <input type="text" id="input_year" placeholder="Year">
+                        <div style="position: absolute; bottom: 35px; display: inline-block;">
+                            <input type="text" id="input_year" value="2019" placeholder="Year">
                         </div>
-                        <div style="display: inline-block;">
+                        <div style="position: absolute; bottom: 60px; display: inline-block;">
                             <select id="selector_month" onchange="changed()">
                                 <option value="1">January</option>
-                                <option value="2">February</option>
+                                <option value="2" selected="selected">February</option>
                                 <option value="3">March</option>
                                 <option value="4">April</option>
                                 <option value="5">May</option>
@@ -55,15 +55,9 @@
                                 <option value="12">December</option>
                             </select>
                         </div>
-                        <div style="display: inline-block;">
+                        <div style="position: absolute; bottom: 85px; display: inline-block;">
                             <select id="selector_day" onchange="changed()">
-                                <option value="6">Sunday</option>
-                                <option value="0">Monday</option> <!-- !! Monday IS 0 !! -->
-                                <option value="1">Tuesday</option>
-                                <option value="2">Wednesday</option>
-                                <option value="3">Thursday</option>
-                                <option value="4">Friday</option>
-                                <option value="5">Saturday</option>
+                                <!-- In code -->
                             </select>
                         </div>
                     </div>
