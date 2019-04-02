@@ -41,8 +41,8 @@ Look at [this](https://firebase.google.com/docs/database/rest/retrieve-data) for
 ## TODO
 - [x] Change the database to be good
     - [x] /data/hall/year/month/day/hour/min.json = percent
-    - [ ] Change the scripts to add correctly too.
-    - [ ] Actually put on database 
+    - [x] Change the scripts to add correctly too.
+    - [x] Actually put on database 
 - [ ] Make the database "private" so you have to use an auth code
 - [ ] Make the website server side to make sure people can't get to the underlying database (and auth keys)
 - [ ] Instead of listing the day when hovering over the line plot, list the hours and minutes
