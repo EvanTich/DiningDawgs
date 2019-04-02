@@ -1,11 +1,11 @@
+const halls = ["bolton", "ohouse", "snelling", "summit", "scott"];
+const halls_pretty = ["Bolton", "O-House", "Snelling", "Joe Frank", "The Niche"];
+
+var barChart;
 var lineChart;
-        
-function Get(yourUrl){
-    var Httpreq = new XMLHttpRequest(); // a new request
-    Httpreq.open("GET",yourUrl,false);
-    Httpreq.send(null);
-    return Httpreq.responseText;          
-}
+
+var last_update_bar;
+var last_update_line;
 
 window.onload = function () {
     // add the days on the day selector
@@ -19,23 +19,8 @@ window.onload = function () {
         }
         x.add(option);
     }
-    
-    
-    var halls = ["bolton", "ohouse", "snelling", "summit", "scott"];
-    var halls_pretty = ["Bolton", "O-House", "Snelling", "Joe Frank", "The Niche"];
-    
-    var arr_b = [];
-    var arr_r = [];
-    for(var i = 0; i < halls.length; i++) {
-        var url_last_update = JSON.parse(Get("https://dining-capacity.firebaseio.com/data/last_update.json")).url;
-        var url = url_last_update.replace("{}", halls[i]);
-        var percent = parseInt(Get(url));
-        
-        arr_b.push({label: halls_pretty[i], y: percent});
-        arr_r.push({label: halls_pretty[i], y: 100 - percent});
-    }
 
-    var chart = new CanvasJS.Chart("chartContainer", {
+    barChart = new CanvasJS.Chart("chartContainer", {
         title:{
             text: "Current Capacity"              
         },
@@ -44,18 +29,17 @@ window.onload = function () {
         },
         data: [              
             {
-                // Change type to "doughnut", "line", "splineArea", etc.
                 type: "stackedColumn100",
-                dataPoints: arr_b
+                dataPoints: []
             },
             {
-                // Change type to "doughnut", "line", "splineArea", etc.
                 type: "stackedColumn100",
-                dataPoints: arr_r
+                dataPoints: []
             }
         ]
     });
-    chart.render();
+    barChart.render();
+    
     lineChart = new CanvasJS.Chart("lineChartContainer", {
         title:{
             text: "Past Traffic"              
@@ -65,14 +49,35 @@ window.onload = function () {
         },
         data: [              
             {
-                // Change type to "doughnut", "line", "splineArea", etc.
                 type: "line",
-                dataPoints: get_arr()
-
+                dataPoints: []
             }
         ]
     });
     lineChart.render();
+    
+    update_bars();
+    update_line();
+    
+    periodic();
+}
+
+function periodic() {
+    var now = Date.now() / 1000;
+    
+    if(last_update_bar + 150 <= now)
+        update_bars();
+    if(last_update_line + 150 <= now)
+        update_line();
+    
+    setInterval(periodic, 150);
+}
+
+function get(yourUrl){
+    var Httpreq = new XMLHttpRequest(); // a new request
+    Httpreq.open("GET",yourUrl,false);
+    Httpreq.send(null);
+    return Httpreq.responseText;          
 }
 
 function getSelector(id) {
@@ -80,8 +85,19 @@ function getSelector(id) {
     return e.options[e.selectedIndex].value;
 }
 
-function pad(n) {
-    return (n < 10 ? "0" : "") + n;
+function get_bars() {
+    var arr_b = [];
+    var arr_r = [];
+    for(var i = 0; i < halls.length; i++) {
+        var url_last_update = JSON.parse(get("https://dining-capacity.firebaseio.com/data/last_update.json")).url;
+        var url = url_last_update.replace("{}", halls[i]);
+        var percent = parseInt(get(url));
+        
+        arr_b.push({label: halls_pretty[i], y: percent});
+        arr_r.push({label: halls_pretty[i], y: 100 - percent});
+    }
+    
+    return [arr_b, arr_r];
 }
 
 function get_arr() {
@@ -94,7 +110,7 @@ function get_arr() {
     url = url.replace("$(hall)", hall).replace("$(year)", year).replace("$(month)", month).replace("$(day)", day);
     
     var points = [];
-    var data = Get(url);
+    var data = get(url);
     if(data == "null") {
         document.getElementById("message").innerHTML = "No data on the selected date!"; // TODO: add more info
         return points;
@@ -120,16 +136,28 @@ function get_arr() {
         return a.x - b.x;
     });
     
+    
     return points;
 }
 
-function update() {
+function update_bars() {
+    var bars = get_bars();
+    barChart.data[0].set("dataPoints", bars[0]);
+    barChart.data[1].set("dataPoints", bars[1]);
+    barChart.render();
+    
+    last_update_bar = Date.now() / 1000;
+}
+
+function update_line() {
     var arr = get_arr();
     lineChart.data[0].set("dataPoints", arr);
     lineChart.render();
+    
+    last_update_line = Date.now() / 1000;
 }
 
 function changed() {
     // check if stuff is correct
-    update();
+    update_line();
 }
