@@ -13,7 +13,7 @@ window.onload = function () {
     for(var i = 1; i < 33; i++) {
         var option = document.createElement("option");
         option.text = i.toString();
-        option.value = i;
+        option.value = (i < 10 ? "0" : "") + i;
         if(i == 1) {
             option.selected = "selected";
         }
@@ -80,23 +80,25 @@ function getSelector(id) {
     return e.options[e.selectedIndex].value;
 }
 
+function pad(n) {
+    return (n < 10 ? "0" : "") + n;
+}
+
 function get_arr() {
     const hall = getSelector("selector_hall");
-    const year = parseInt(document.getElementById("input_year").value);
-    const month = parseInt(getSelector("selector_month"));
-    const day = parseInt(getSelector("selector_day"));
+    const year = document.getElementById("input_year").value;
+    const month = getSelector("selector_month");
+    const day = getSelector("selector_day");
     var url = `https://dining-capacity.firebaseio.com/data/$(hall)/$(year)/$(month)/$(day).json`;
     
     url = url.replace("$(hall)", hall).replace("$(year)", year).replace("$(month)", month).replace("$(day)", day);
     
     var points = [];
     var data = Get(url);
-    console.log(data);
     if(data == "null") {
         document.getElementById("message").innerHTML = "No data on the selected date!"; // TODO: add more info
         return points;
     } else document.getElementById("message").innerHTML = "";
-    console.log("nice");
     
     var hours = JSON.parse(data); // lots of hours
     var hours_keys = Object.keys(hours);
@@ -106,12 +108,17 @@ function get_arr() {
         var mins_keys = Object.keys(mins);
         for(var j = 0; j < mins_keys.length; j++) {
   
-            var date = new Date(year, month, day, hours_keys[i], mins_keys[j]);
+            var str = year + "-" + month + "-" + day + " " + hours_keys[i] + ":" + mins_keys[j] + ":00";
+            var date = new Date(str);
             var percent = mins[mins_keys[j]];
             
             points.push({x: date, y: percent});
         }
     }
+    
+    points.sort(function(a, b) {
+        return a.x - b.x;
+    });
     
     return points;
 }
