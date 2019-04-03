@@ -72,7 +72,7 @@ window.onload = function () {
     update_bars();
     update_line();
     
-    periodic();
+    // periodic();
 }
 
 function periodic() {
@@ -153,10 +153,15 @@ function get_arr() {
     return points;
 }
 
+function set(dataPoints, data) {
+    dataPoints.splice(0, dataPoints.length);
+    data.forEach(d => dataPoints.push(d));
+}
+
 function update_bars() {
     var bars = get_bars();
-    barChart.data[0].set("dataPoints", bars[0]);
-    barChart.data[1].set("dataPoints", bars[1]);
+    set(barChart.options.data[0].dataPoints, bars[0]);
+    set(barChart.options.data[1].dataPoints, bars[1]);
     barChart.render();
     
     last_update_bar = Date.now() / 1000;
@@ -164,7 +169,7 @@ function update_bars() {
 
 function update_line() {
     var arr = get_arr();
-    lineChart.data[0].set("dataPoints", arr);
+    set(lineChart.options.data[0].dataPoints, arr);
     lineChart.render();
     
     last_update_line = Date.now() / 1000;
