@@ -1,3 +1,4 @@
+#! /usr/bin/python3
 import time, requests, json
 
 PAGE = 'https://www.cardservices.uga.edu/fs_mobile/index.php/dashboard/occupancies/'
@@ -5,8 +6,6 @@ DATABASE = 'https://dining-capacity.firebaseio.com/data/'
 
 def update_data():
     # update the data at the REST endpoint
-    gmtime = time.gmtime()
-    
     current_time = int(time.time())
     
     page_no = DATABASE + time.strftime('{}/%Y/%m/%d/%H/%M.json')
@@ -30,10 +29,16 @@ def update_data():
         
 
 SLEEP_TIME = 5 * 60
+
+# get first t that is an even 5 minute interval
+unix_time = int(time.time())
+t = unix_time + 300 - (unix_time % SLEEP_TIME)
+
 i = 0
 while True:
-    print("Iteration: "  + str(i))
-    t = update_data()
+    print('Time: {:12d} Iteration: {:6d}'.format(t, i))
+    update_data()
+    t += SLEEP_TIME
     i += 1
     while t > time.time():
         time.sleep(1)
