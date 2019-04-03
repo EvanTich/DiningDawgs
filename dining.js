@@ -27,13 +27,23 @@ window.onload = function () {
         axisY:{
             title: "Capacity(%)"
         },
-        data: [              
+        axisX:{
+            title: "Dining Halls"
+        },
+        data: [  
             {
                 type: "stackedColumn100",
+                legendText: "Full",
+			    showInLegend: "true",
+			    indexLabel: "#percent %",
+			    indexLabelPlacement: "inside",
+			    indexLabelFontColor: "white",
                 dataPoints: []
             },
             {
                 type: "stackedColumn100",
+                legendText: "Empty",
+                showInLegend: "true",
                 dataPoints: []
             }
         ]
@@ -45,7 +55,10 @@ window.onload = function () {
             text: "Past Traffic"              
         },
         axisY:{
-            title: "Capacity(%)"
+            title: "Capacity (%)"
+        },
+        axisX:{
+            title: "Time (Hours)"
         },
         data: [              
             {
