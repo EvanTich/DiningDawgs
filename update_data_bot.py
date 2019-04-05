@@ -25,20 +25,18 @@ def update_data():
     
     requests.put(DATABASE + 'last_update.json', headers=headers, data=json.dumps(last_update))
     requests.put(DATABASE + 'next_update.json', headers=headers, data=str(next_update))
-    return next_update
-        
 
 SLEEP_TIME = 5 * 60
 
 # get first t that is an even 5 minute interval
 unix_time = int(time.time())
-t = unix_time + 300 - (unix_time % SLEEP_TIME)
+t = unix_time + SLEEP_TIME - (unix_time % SLEEP_TIME)
 
 i = 0
 while True:
+    while t > int(time.time()):
+        time.sleep(2)
     print('Time: {:12d} Iteration: {:6d}'.format(t, i))
     update_data()
     t += SLEEP_TIME
     i += 1
-    while t > time.time():
-        time.sleep(1)
