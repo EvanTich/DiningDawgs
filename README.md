@@ -52,3 +52,4 @@ Look at [this](https://firebase.google.com/docs/database/rest/retrieve-data) for
 - [ ] Option to show all dining hall lines on same graph
 - [ ] Have a proper title, heading, and stuff below on the page
 - [ ] Perhaps change from CanvasJS to a free alternative (that link in the bottom is stupid)
+- [ ] Asyncronous calls for getting the json data and updating the graph

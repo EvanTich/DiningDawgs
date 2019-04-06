@@ -7,7 +7,7 @@ var lineChart;
 var last_update_bar;
 var last_update_line;
 
-window.onload = function () {
+window.onload = function() {
     // add the days on the day selector
     var x = document.getElementById("selector_day");
     for(var i = 1; i < 33; i++) {
@@ -86,11 +86,12 @@ function periodic() {
     setInterval(periodic, 150);
 }
 
-function get(yourUrl){
+function get(url) {
     var Httpreq = new XMLHttpRequest(); // a new request
-    Httpreq.open("GET",yourUrl,false);
+    Httpreq.open("GET", url, false);
     Httpreq.send(null);
-    return Httpreq.responseText;          
+    
+    return Httpreq.responseText;
 }
 
 function getSelector(id) {
@@ -101,8 +102,9 @@ function getSelector(id) {
 function get_bars() {
     var arr_b = [];
     var arr_r = [];
+    
+    var url_last_update = JSON.parse(get("https://dining-capacity.firebaseio.com/data/last_update.json")).url;
     for(var i = 0; i < halls.length; i++) {
-        var url_last_update = JSON.parse(get("https://dining-capacity.firebaseio.com/data/last_update.json")).url;
         var url = url_last_update.replace("{}", halls[i]);
         var percent = parseInt(get(url));
         
@@ -118,9 +120,7 @@ function get_arr() {
     const year = document.getElementById("input_year").value;
     const month = getSelector("selector_month");
     const day = getSelector("selector_day");
-    var url = `https://dining-capacity.firebaseio.com/data/$(hall)/$(year)/$(month)/$(day).json`;
-    
-    url = url.replace("$(hall)", hall).replace("$(year)", year).replace("$(month)", month).replace("$(day)", day);
+    var url = `https://dining-capacity.firebaseio.com/data/${hall}/${year}/${month}/${day}.json`;
     
     var points = [];
     var data = get(url);

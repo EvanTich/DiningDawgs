@@ -39,7 +39,7 @@ def update_data():
     
     last_update = {
         "time": current_time,
-        "url": page_no
+        "url": DATABASE + page_no
     }
     next_update = current_time + 300
     
