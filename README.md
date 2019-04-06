@@ -43,7 +43,7 @@ Look at [this](https://firebase.google.com/docs/database/rest/retrieve-data) for
     - [x] /data/hall/year/month/day/hour/min.json = percent
     - [x] Change the scripts to add correctly too.
     - [x] Actually put on database 
-- [ ] Make the database "private" so you have to use an auth code
+- [x] Make the database "private" so you have to use an auth code
 - [ ] Make the website server side to make sure people can't get to the underlying database (and auth keys)
 - [ ] Instead of listing the day when hovering over the line plot, list the hours and minutes
 - [x] Update the website's current capacity periodically (every 5 minutes)
@@ -51,3 +51,4 @@ Look at [this](https://firebase.google.com/docs/database/rest/retrieve-data) for
 - [ ] Stop a user from choosing an invalid date
 - [ ] Option to show all dining hall lines on same graph
 - [ ] Have a proper title, heading, and stuff below on the page
+- [ ] Perhaps change from CanvasJS to a free alternative (that link in the bottom is stupid)
