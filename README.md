@@ -1,4 +1,5 @@
 # UGADiningCapacity
+By the by: Never ever run the setup script unless you want to delete everything in the database.
 
 Github Pages link : https://jlc94087.github.io/UGADiningCapacity/
 
