@@ -55,7 +55,8 @@ window.onload = function() {
             text: "Past Traffic"              
         },
         axisY:{
-            title: "Capacity (%)"
+            title: "Capacity (%)",
+	    maximum: 100
         },
         axisX:{
             title: "Time (Hours)"

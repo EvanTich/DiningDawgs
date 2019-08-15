@@ -48,7 +48,7 @@ for log in logs:
     data["next_update"] = unix_time + 300 
 
 headers = {'Content-type': 'application/json'}
-r = requests.put('https://dining-capacity.firebaseio.com/data.json', headers=headers, data=json.dumps(data))
+r = requests.patch('https://dining-capacity.firebaseio.com/data.json', headers=headers, data=json.dumps(data))
 
 if r.status_code == 200:
     print("data now inside database")
