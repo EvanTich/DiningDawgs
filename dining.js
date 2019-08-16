@@ -14,6 +14,16 @@ var barChart;
 var lineChart;
 
 // TODO: more formatting
+const dateSupported = isDateSupported();
+
+function isDateSupported() {
+	var input = document.createElement('input');
+	var value = 'a';
+	input.setAttribute('type', 'date');
+	input.setAttribute('value', value);
+	return (input.value !== value);
+}
+
 
 // current time in HH:MM AM/PM format
 function getTime(date) {
@@ -29,7 +39,7 @@ function pad(i) {
 }
 
 function selectNow() {
-    let now = new Date();
+    let now = new Date(); // todays date
     let year = now.getFullYear(),
         month = now.getMonth() + 1, // 0 is jan, but our jan is 1
         day = now.getDate();
@@ -67,12 +77,7 @@ function getBarGraphData() {
     return [actual, invert];
 }
 
-function getLineGraphData() {
-    const hall = hallSelector.value; // only used once but kept here because why not
-    const year = yearInput.value;
-    const month = monthSelector.value;
-    const day = daySelector.value;
-    
+function getLineGraphData(hall, year, month, day) {
     let points = [];
     let data = get(`https://dining-capacity.firebaseio.com/data/${hall}/${year}/${month}/${day}.json`);
     if(data == "null") {
@@ -115,7 +120,7 @@ function updateBarGraph() {
 }
 
 function updateLineGraph() {
-    let arr = getLineGraphData();
+    let arr = getLineGraphData(hallSelector.value, yearInput.value, monthSelector.value, daySelector.value);
     set(lineChart.options.data[0].dataPoints, arr);
     lineChart.render();
 }
@@ -140,12 +145,17 @@ function changedMonth() {
 }
 
 window.onload = function() {
-    // TODO: contruct the hall selector from the halls and halls_pretty arrays
-    // reason: double data is bad
+    // add the halls to the hall selector
+    for(let i = 0; i < halls.length; i++) {
+        let option = document.createElement("option");
+        option.text = halls_pretty[i];
+        option.value = halls[i];
+        hallSelector.add(option);
+    }
 
     // add the days on the day selector, 1 to 31
-    for(var i = 1; i < 32; i++) {
-        var option = document.createElement("option");
+    for(let i = 1; i < 32; i++) {
+        let option = document.createElement("option");
         option.text = i.toString();
         option.value = pad(i);
         daySelector.add(option);
@@ -154,13 +164,13 @@ window.onload = function() {
     selectNow();
 
     barChart = new CanvasJS.Chart("chartContainer", {
-        title:{
+        title: {
             text: "Current Capacity"              
         },
-        axisY:{
+        axisY: {
             title: "Capacity(%)"
         },
-        axisX:{
+        axisX: {
             title: "Dining Halls"
         },
         toolTip: {
@@ -187,14 +197,14 @@ window.onload = function() {
     barChart.render();
     
     lineChart = new CanvasJS.Chart("lineChartContainer", {
-        title:{
+        title: {
             text: "Past Traffic"              
         },
-        axisY:{
+        axisY: {
             title: "Capacity (%)",
             maximum: 100
         },
-        axisX:{
+        axisX: {
             title: "Time"
         },
         toolTip: {
