@@ -48,7 +48,7 @@ Look at [this](https://firebase.google.com/docs/database/rest/retrieve-data) for
 - [ ] Make the website server side to make sure people can't get to the underlying database (and auth keys)
 - [x] Instead of listing the day when hovering over the line plot, list the hours and minutes
 - [x] Update the website's current capacity periodically (every 5 minutes)
-- [ ] Fix the positioning of the selectors
+- [x] Fix the positioning of the selectors (sorta)
 - [ ] Stop a user from choosing an invalid date
     - [x] user can only choose actual dates, e.g. Feb 30 (doesn't exist)
 - [ ] Option to show all dining hall lines on same graph

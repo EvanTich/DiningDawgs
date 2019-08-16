@@ -14,7 +14,6 @@
             <ul class="nav nav-tabs">
                 <li class="active"><a data-toggle="tab" href="#home">Current Capacity</a></li>
                 <li><a data-toggle="tab" href="#menu1">Dining Traffic History</a></li>
-
             </ul>
 
             <div class="tab-content">
@@ -28,18 +27,19 @@
                     <div id="inputs" style="position: absolute; bottom: 85px; display: inline-block;">
                         <h1 id="message"></h1>
                         <div>
-                            <select id="selector_hall" onchange="updateLineGraph()"></select>
+                            <label for="hallSelector">Choose a dining hall: </label>
+                            <select id="hallSelector" onchange="updateLineGraph()"></select>
                         </div>
                         <div id="dateSupported">
-                            <label for="datePicker">Choose a date<!--<span id="fallback">(in YYYY-MM-DD format)</span>-->: </label>
-                            <input type="date" id="datePicker" name="date" required pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}">
+                            <label for="dateInput">Choose a date<!--<span id="fallback">(in YYYY-MM-DD format)</span>-->: </label>
+                            <input type="date" id="dateInput" name="date" onchange="updateLineGraph()" required pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}">
                             <span class="validity"></span>
                         </div>
                         <!-- fallback html for Safari and IE <= 11 -->
-                        <!-- <div id="fallback" style="display:none">
-                            <label for="input_year">Choose a date: </label>
-                            <input type="text" id="input_year" value="2019" placeholder="Year">
-                            <select id="selector_month" onchange="changedMonth()">
+                        <div id="fallback" style="display:none">
+                            <label for="yearInput">Choose a date: </label>
+                            <input type="number" id="yearInput" value="2019" placeholder="Year" oninput="updateLineGraph()" pattern="[0-9]">
+                            <select id="monthSelector" onchange="changedMonth()">
                                 <option value="01">January</option>
                                 <option value="02">February</option>
                                 <option value="03">March</option>
@@ -53,8 +53,8 @@
                                 <option value="11">November</option>
                                 <option value="12">December</option>
                             </select>
-                            <select id="selector_day" onchange="updateLineGraph()"></select>
-                        </div> -->
+                            <select id="daySelector" onchange="updateLineGraph()"></select>
+                        </div>
                     </div>
 
                 </div>

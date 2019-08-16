@@ -1,29 +1,32 @@
 const halls = ["bolton", "ohouse", "snelling", "summit", "scott"];
 const halls_pretty = ["Bolton", "O-House", "Snelling", "Joe Frank", "The Niche"];
 
-// selectors
-const yearInput = document.getElementById("input_year");
-const monthSelector = document.getElementById("selector_month");
-const daySelector = document.getElementById("selector_day");
-const hallSelector = document.getElementById("selector_hall");
+// inputs
+const hallSelector = document.getElementById("hallSelector");
+const dateInput = document.getElementById("dateInput");
 
+// fallback selectors
+const yearInput = document.getElementById("yearInput");
+const monthSelector = document.getElementById("monthSelector");
+const daySelector = document.getElementById("daySelector");
+
+// notification boxes
 const messageBox = document.getElementById("message");
 const lastUpdatedBox = document.getElementById("lastUpdated");
 
 var barChart;
 var lineChart;
 
-// TODO: more formatting
 const dateSupported = isDateSupported();
 
 function isDateSupported() {
+    // thanks to chris@gomakethings.com for this snippet of code
 	var input = document.createElement('input');
 	var value = 'a';
 	input.setAttribute('type', 'date');
 	input.setAttribute('value', value);
-	return (input.value !== value);
+	return input.value !== value;
 }
-
 
 // current time in HH:MM AM/PM format
 function getTime(date) {
@@ -41,32 +44,42 @@ function pad(i) {
 function selectNow() {
     let now = new Date(); // todays date
     let year = now.getFullYear(),
-        month = now.getMonth() + 1, // 0 is jan, but our jan is 1
-        day = now.getDate();
+        month = pad(now.getMonth() + 1), // 0 is jan, but our jan is 1
+        day = pad(now.getDate());
+
+    dateInput.value = `${year}-${month}-${day}`;
     
     yearInput.value = year;
-    monthSelector.value = pad(month);
-    daySelector.value = pad(day);
+    monthSelector.value = month;
+    daySelector.value = day;
 }
 
 function get(url) {
-    let Httpreq = new XMLHttpRequest(); // a new request
-    Httpreq.open("GET", url, false);
-    Httpreq.send(null);
+    let req = new XMLHttpRequest(); // a new request
+    req.open("GET", url, false);
+    req.send(null);
     
-    return Httpreq.responseText;
+    return req.responseText;
 }
 
 function getBarGraphData() {
     let actual = [];
     let invert = [];
     
+    /*
+    // * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+    // * Note to anybody thinking about using this data:     *
+    // * --> please do not call an excessive amount of times.*
+    // *     Thanks!                                         *
+    // * p.s. we only have the free version of firebase :)   *
+    // * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+    */
     let lastUpdate = JSON.parse(get("https://dining-capacity.firebaseio.com/data/last_update.json"));
     let date = new Date(lastUpdate.time * 1000);
     // change last update box
     lastUpdatedBox.innerHTML = `Latest Update: ${getTime(date)}`;
 
-    for(var i = 0; i < halls.length; i++) {
+    for(let i = 0; i < halls.length; i++) {
         let url = lastUpdate.url.replace("{}", halls[i]);
         let percent = parseInt(get(url));
         
@@ -79,6 +92,14 @@ function getBarGraphData() {
 
 function getLineGraphData(hall, year, month, day) {
     let points = [];
+    /*
+    // * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+    // * Note to anybody thinking about using this data:     *
+    // * --> please do not call an excessive amount of times.*
+    // *     Thanks!                                         *
+    // * p.s. we only have the free version of firebase :)   *
+    // * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+    */
     let data = get(`https://dining-capacity.firebaseio.com/data/${hall}/${year}/${month}/${day}.json`);
     if(data == "null") {
         messageBox.innerHTML = "No data on the selected date!"; // TODO: add more info
@@ -86,23 +107,17 @@ function getLineGraphData(hall, year, month, day) {
     } else messageBox.innerHTML = "";
     
     let hours = JSON.parse(data); // lots of hours
-    let hours_keys = Object.keys(hours);
-    for(let i = 0; i < hours_keys.length; i++) {
-        
-        let mins = hours[hours_keys[i]];
-        let mins_keys = Object.keys(mins);
-        for(let j = 0; j < mins_keys.length; j++) {
-  
-            let str = `${year}-${month}-${day} ${hours_keys[i]}:${mins_keys[j]}:00`;
-            let date = new Date(str);
-            let percent = mins[mins_keys[j]];
+    for(let hour in hours) {
+        let mins = hours[hour];
+        for(let min in mins) {
+            let date = new Date(`${year}-${month}-${day} ${hour}:${min}:00`);
+            let percent = mins[min];
             
             points.push({x: date, y: percent, tooltip:`${getTime(date)}`});
         }
     }
     
     points.sort( (a, b) => a.x - b.x);
-    
     
     return points;
 }
@@ -120,13 +135,16 @@ function updateBarGraph() {
 }
 
 function updateLineGraph() {
-    let arr = getLineGraphData(hallSelector.value, yearInput.value, monthSelector.value, daySelector.value);
+    let arr;
+    if(dateSupported) {
+        let [year, month, day] = dateInput.value.split("-");
+        arr = getLineGraphData(hallSelector.value, year, month, day);
+    } else {
+        arr = getLineGraphData(hallSelector.value, yearInput.value, monthSelector.value, daySelector.value);
+    }
+
     set(lineChart.options.data[0].dataPoints, arr);
     lineChart.render();
-}
-
-function changed() {
-    updateLineGraph();
 }
 
 function changedMonth() {
@@ -144,7 +162,13 @@ function changedMonth() {
     updateLineGraph();
 }
 
-window.onload = function() {
+window.onload = () => {
+    if(!dateSupported) {
+        // hide date picker input, show the selectors
+        document.getElementById("fallback").style.display = "";
+        document.getElementById("dateSupported").style.display = "none";
+    }
+
     // add the halls to the hall selector
     for(let i = 0; i < halls.length; i++) {
         let option = document.createElement("option");
@@ -222,9 +246,13 @@ window.onload = function() {
     updateBarGraph();
     updateLineGraph();
     
-    // wait until 500ms after the last expected update to start updating regularly
+    // wait until 500ms after the last expected update (time % 5min == 0) to start updating regularly
     const SLEEP = 300000;
     setTimeout( () => {
+        // initial update
+        updateBarGraph();
+        updateLineGraph();
+
         setInterval( () => {
             // update graphs
             updateBarGraph();

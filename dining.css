@@ -1,3 +1,7 @@
 body {
     text-align: center; 
 }
+
+#lineChartContainer, #chartContainer {
+    width: 75%;
+}
