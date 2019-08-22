@@ -175,6 +175,23 @@ function changedMonth() {
     updateLineGraph();
 }
 
+function drawLabels() {
+    let chart = this.chart;
+    let ctx = chart.ctx;
+    ctx.font = '20px Helvetica'; // TODO find way to find dynamically
+    ctx.fillStyle = 'black';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+
+    this.data.datasets.forEach((dataset, i) => {
+        let meta = chart.controller.getDatasetMeta(i);
+        meta.data.forEach((bar, index) => {
+            let y = bar._model.y + (dataset.data[index] < 10 ? -5 : ((bar._view.base - bar._view.y) / 2 + 5));
+            ctx.fillText(dataset.data[index] + '%', bar._model.x, y);
+        });
+    });
+}
+
 window.onload = () => {
     if(!dateSupported) {
         // hide date picker input, show the selectors
@@ -256,25 +273,14 @@ window.onload = () => {
                     }
                 }]
             },
-            hover: { // no tooltip animation
+            hover: { // no tooltip animation, fixes floating labels
                 animationDuration: 0 
             },
             animation: {
-                onComplete: function() {
-                    let chart = this.chart;
-                    let ctx = chart.ctx;
-                    ctx.font = '20px Helvetica'; // TODO find way to find dynamically
-                    ctx.fillStyle = 'black'; // TODO same here ^^^
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'bottom';
-            
-                    this.data.datasets.forEach((dataset, i) => {
-                        let meta = chart.controller.getDatasetMeta(i);
-                        meta.data.forEach((bar, index) => {
-                            ctx.fillText(dataset.data[index] + '%', bar._model.x, chart.height - 60);
-                        });
-                    });
-                }
+                duration: 500, // in ms
+                // test with: var asda = 0; setInterval(() => {barChart.data.datasets[0].data[0] = (asda = asda % 100 + 5); barChart.update();}, 1500);
+                onProgress: drawLabels, // TODO fix jumps that happen here
+                onComplete: drawLabels
             }
         }
     });

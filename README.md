@@ -61,3 +61,6 @@ Look at [this](https://firebase.google.com/docs/database/rest/retrieve-data) for
 - [x] Fix width of the graph being messed up when the page loads initially
     - fixed when moving over to ChartJS
 - [ ] Remove bootstrap and jquery dependencies
+- [ ] Find a way to get font dynamically when drawing floating labels
+- [ ] Fix the sudden jump for the floating labels when bar chart updates
+    - Test with code snippet: `var asda = 0; setInterval(() => {barChart.data.datasets[0].data[0] = (asda = asda % 100 + 5); barChart.update();}, 1500);`
