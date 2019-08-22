@@ -46,6 +46,7 @@ Look at [this](https://firebase.google.com/docs/database/rest/retrieve-data) for
     - [x] Actually put on database 
 - [x] Make the database "private" so you have to use an auth code
 - [ ] Make the website server side to make sure people can't get to the underlying database (and auth keys)
+    - [ ] locally store the latest version of the webpage (problems with updating the graph with this approach)
 - [x] Instead of listing the day when hovering over the line plot, list the hours and minutes
 - [x] Update the website's current capacity periodically (every 5 minutes)
 - [x] Fix the positioning of the selectors (sorta)
@@ -53,7 +54,10 @@ Look at [this](https://firebase.google.com/docs/database/rest/retrieve-data) for
     - [x] user can only choose actual dates, e.g. Feb 30 (doesn't exist)
 - [ ] Option to show all dining hall lines on same graph
 - [ ] Have a proper title, heading, and stuff below on the page
-- [ ] Perhaps change from CanvasJS to a free alternative (that link in the bottom is stupid)
+- [x] Perhaps change from CanvasJS to a free alternative (that link in the bottom is stupid)
+    - changed to ChartJS, it works well enough
 - [x] Asyncronous calls for getting the ~json data~(sorta) and updating the graph
 - [ ] Seperate the two tabs from one page to two pages
-- [ ] Fix width of the graph being messed up when the page loads initially
+- [x] Fix width of the graph being messed up when the page loads initially
+    - fixed when moving over to ChartJS
+- [ ] Remove bootstrap and jquery dependencies

@@ -17,20 +17,18 @@ const lastUpdatedBox = document.getElementById("lastUpdated");
 var barChart;
 var lineChart;
 
-const dateSupported = isDateSupported();
-
-function isDateSupported() {
+const dateSupported = (function() {
     // thanks to chris@gomakethings.com for this snippet of code
-	var input = document.createElement('input');
-	var value = 'a';
+	let input = document.createElement('input');
+	let value = 'a';
 	input.setAttribute('type', 'date');
 	input.setAttribute('value', value);
 	return input.value !== value;
-}
+})();
 
 // current time in HH:MM AM/PM format
 function getTime(date) {
-    return `${pad(date.getHours() > 12 ? date.getHours() - 12 : date.getHours())}:${pad(date.getMinutes())} ${date.getHours() < 12 ? "AM" : "PM"}`;
+    return `${date.getHours() == 0 ? 12 : pad(date.getHours() > 12 ? date.getHours() - 12 : date.getHours())}:${pad(date.getMinutes())} ${date.getHours() < 12 ? "AM" : "PM"}`;
 }
 
 function daysInMonth(month) {
@@ -38,7 +36,7 @@ function daysInMonth(month) {
 }
 
 function pad(i) {
-    return `${i < 10 ? "0" : ""}${i}`; // pad with 0 if needed
+    return `${i < 10 ? '0' : ''}${i}`; // pad with 0 if needed
 }
 
 function selectNow() {
@@ -56,7 +54,7 @@ function selectNow() {
 
 function get(url) {
     let req = new XMLHttpRequest(); // a new request
-    req.open("GET", url, false);
+    req.open('GET', url, false);
     req.send(null);
     
     return req.responseText;
@@ -64,7 +62,6 @@ function get(url) {
 
 function getBarGraphData() {
     let actual = [];
-    let invert = [];
     
     /*
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -74,24 +71,25 @@ function getBarGraphData() {
     // * p.s. we only have the free version of firebase :)   *
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * *
     */
-    let lastUpdate = JSON.parse(get("https://dining-capacity.firebaseio.com/data/last_update.json"));
+    let lastUpdate = JSON.parse(get('https://dining-capacity.firebaseio.com/data/last_update.json'));
     let date = new Date(lastUpdate.time * 1000);
     // change last update box
     lastUpdatedBox.innerHTML = `Latest Update: ${getTime(date)}`;
 
     for(let i = 0; i < halls.length; i++) {
-        let url = lastUpdate.url.replace("{}", halls[i]);
+        let url = lastUpdate.url.replace('{}', halls[i]);
         let percent = parseInt(get(url));
         
-        actual.push({label: halls_pretty[i], y: percent});
-        invert.push({label: halls_pretty[i], y: 100 - percent});
+        // actual.push({label: halls_pretty[i], y: percent}); // may want
+        actual.push(percent);
     }
     
-    return [actual, invert];
+    return actual;
 }
 
 function getLineGraphData(hall, year, month, day) {
     let points = [];
+
     /*
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * *
     // * Note to anybody thinking about using this data:     *
@@ -101,10 +99,10 @@ function getLineGraphData(hall, year, month, day) {
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * *
     */
     let data = get(`https://dining-capacity.firebaseio.com/data/${hall}/${year}/${month}/${day}.json`);
-    if(data == "null") {
-        messageBox.innerHTML = "No data on the selected date!"; // TODO: add more info
+    if(data == 'null') {
+        messageBox.innerHTML = 'No data on the selected date!'; // TODO: add more info
         return points;
-    } else messageBox.innerHTML = "";
+    } else messageBox.innerHTML = '';
     
     let hours = JSON.parse(data); // lots of hours
     for(let hour in hours) {
@@ -113,7 +111,7 @@ function getLineGraphData(hall, year, month, day) {
             let date = new Date(`${year}-${month}-${day} ${hour}:${min}:00`);
             let percent = mins[min];
             
-            points.push({x: date, y: percent, tooltip:`${getTime(date)}`});
+            points.push({x: date, y: percent, tooltip: getTime(date)});
         }
     }
     
@@ -128,10 +126,9 @@ function set(dataPoints, data) {
 }
 
 function updateBarGraph() {
-    let bars = getBarGraphData();
-    set(barChart.options.data[0].dataPoints, bars[0]);
-    set(barChart.options.data[1].dataPoints, bars[1]);
-    barChart.render();
+    let bar = getBarGraphData();
+    set(barChart.data.datasets[0].data, bar);
+    barChart.update();
 }
 
 function updateLineGraph() {
@@ -143,8 +140,24 @@ function updateLineGraph() {
         arr = getLineGraphData(hallSelector.value, yearInput.value, monthSelector.value, daySelector.value);
     }
 
-    set(lineChart.options.data[0].dataPoints, arr);
-    lineChart.render();
+    set(lineChart.data.datasets[0].data, arr);
+    lineChart.update();
+}
+
+function update() {
+    updateBarGraph();
+    // if on current day, update
+    let selected;
+    if(dateSupported) {
+        let [year, month, day] = dateInput.value.split("-");
+        selected = new Date(year, month - 1, day); // why are months indexed?
+    } else {
+        selected = new Date(yearInput.value, monthSelector.value - 1, daySelector.value);
+    }
+
+    if(new Date().toDateString() === selected.toDateString()) {
+        updateLineGraph();
+    }
 }
 
 function changedMonth() {
@@ -187,76 +200,164 @@ window.onload = () => {
 
     selectNow();
 
-    barChart = new CanvasJS.Chart("chartContainer", {
-        title: {
-            text: "Current Capacity"              
+    // TODO add floating label on the bars
+    barChart = new Chart('barContainer', {
+        type: 'bar',
+        data: {
+            labels: [...halls_pretty], // copy hall names to labels
+            datasets: [{
+                label: '# of Votes',
+                data: [],
+                // bonus green to red color changer based on value, which is sadly unused... ;(
+                // backgroundColor: context => {
+                // 	let value = context.dataset.data[context.dataIndex];
+                // 	const max = 90;
+                // 	const min = 25;
+                // 	return `hsla(${value <= min ? 120 : (value >= max ? 0 : ((1 - (value - min) / (max - min)) * 120))}, 100%, 45%, 1)`;
+                // },
+                backgroundColor: 'hsl(212, 57%, 60%)', // nice shade of blue
+                hoverBackgroundColor: 'hsl(212, 57%, 50%)',
+                borderColor: 'blue',
+                borderWidth: 1
+            }]
         },
-        axisY: {
-            title: "Capacity(%)"
-        },
-        axisX: {
-            title: "Dining Halls"
-        },
-        toolTip: {
-            content: "<span style='\"'color: {color}'\"'>{label}</span>: {y}%"
-        },
-        data: [  
-            {
-                type: "stackedColumn100",
-                legendText: "Full",
-			    showInLegend: "true",
-			    indexLabel: "#percent %",
-			    indexLabelPlacement: "inside",
-			    indexLabelFontColor: "white",
-                dataPoints: []
+        options: {
+            title: {
+                display: true,
+                text: 'Current Occupancy'
             },
-            {
-                type: "stackedColumn100",
-                legendText: "Empty",
-                showInLegend: "true",
-                dataPoints: []
+            legend: {
+                display: false
+            },
+            tooltips: {
+                enabled: true,
+                displayColors: false,
+                callbacks: {
+                    label: (item, data) => {
+                        return `${item.label}: ${item.value}%`;
+                    }
+                }
+            },
+            scales: {
+                xAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Dining Halls'
+                    }
+                }],
+                yAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Occupancy (%)'
+                    },
+                    ticks: {
+                        max: 100,
+                        beginAtZero: true
+                    }
+                }]
+            },
+            hover: { // no tooltip animation
+                animationDuration: 0 
+            },
+            animation: {
+                onComplete: function() {
+                    let chart = this.chart;
+                    let ctx = chart.ctx;
+                    ctx.font = '20px Helvetica'; // TODO find way to find dynamically
+                    ctx.fillStyle = 'black'; // TODO same here ^^^
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'bottom';
+            
+                    this.data.datasets.forEach((dataset, i) => {
+                        let meta = chart.controller.getDatasetMeta(i);
+                        meta.data.forEach((bar, index) => {
+                            ctx.fillText(dataset.data[index] + '%', bar._model.x, chart.height - 60);
+                        });
+                    });
+                }
             }
-        ]
+        }
     });
-    barChart.render();
-    
-    lineChart = new CanvasJS.Chart("lineChartContainer", {
-        title: {
-            text: "Past Traffic"              
+
+    lineChart = new Chart('lineContainer', {
+        type: 'scatter', // its a line plot, trust me
+        data: {
+            datasets: [{
+                label: 'Line',
+                showLine: true,
+                fill: false,
+                backgroundColor: 'rgba(0, 0, 255, .5)',
+                borderColor: 'rgba(0, 0, 255, .5)',
+                data: []
+            }]
         },
-        axisY: {
-            title: "Capacity (%)",
-            maximum: 100
-        },
-        axisX: {
-            title: "Time"
-        },
-        toolTip: {
-            content: "<span style='\"'color: {color}'\"'>{tooltip}</span>: {y}%"
-        },
-        data: [              
-            {
-                type: "line",
-                dataPoints: []
+        options: {
+            title: {
+                display: true,
+                text: 'Past Occupancy'
+            },
+            legend: {
+                display: false
+            },
+            elements: {
+                point: {
+                    radius: 0,
+                    hitRadius: 4
+                },
+                line: { // no smoothing
+                    tension: 0
+                }
+            },
+            animation: { // no animation
+                duration: 0 
+            },
+            hover: { // no tooltip animation
+                animationDuration: 0 
+            },
+            responsiveAnimationDuration: 0, // animation duration after a resize
+            tooltips: {
+                enabled: true,
+                intersect: false,
+                mode: 'index',
+                displayColors: false,
+                callbacks: {
+                    label: (item, data) => {
+                        let tooltip = data.datasets[item.datasetIndex].data[item.index].tooltip;
+                        return `${tooltip}: ${item.value}%`;
+                    }
+                }
+            },
+            scales: {
+                yAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Occupancy (%)'
+                    },
+                    ticks: {
+                        max: 100,
+                        beginAtZero: true
+                    }
+                }],
+                xAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Time'
+                    },
+                    type: 'time',
+                    position: 'bottom'
+                }]
             }
-        ]
+        }
     });
-    lineChart.render();
     
-    updateBarGraph();
-    updateLineGraph();
+    update();
     
-    // wait until 500ms after the last expected update (time % 5min == 0) to start updating regularly
+    // wait until 5s after the last expected update (time % 5min == 0) to start updating regularly
     const SLEEP = 300000;
     setTimeout( () => {
         // initial update
-        updateBarGraph();
-        updateLineGraph();
-
-        setInterval( () => {
-            // update graphs
-            updateBarGraph();
-            updateLineGraph();
-        }, SLEEP);
-    }, SLEEP - (Date.now() % SLEEP) + 500);
+        update();
+        // every other update
+        setInterval(update, SLEEP);
+    }, SLEEP - (Date.now() % SLEEP) + 5000);
 };
