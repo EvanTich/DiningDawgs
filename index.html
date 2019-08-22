@@ -6,7 +6,6 @@
         <link src="dining.css" type="text/css">
         <script src="https://cdn.jsdelivr.net/npm/moment@2.24.0/moment.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.min.js"></script>
-        <!--<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>-->
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
@@ -22,12 +21,12 @@
             <div class="tab-content">
                 <div id="home" class="tab-pane fade in active">
                     <canvas id="barContainer"></canvas>   
-                    <h1 id="lastUpdated" style="position: absolute; bottom: 35px; display: inline-block;"></h1>
+                    <h1 id="lastUpdated"></h1>
                 </div>
                 <div id="menu1" class="tab-pane fade">
                     <canvas id="lineContainer"></canvas>
                     
-                    <div id="inputs" style="position: absolute; bottom: 85px; display: inline-block;">
+                    <div id="inputs">
                         <h1 id="message"></h1>
                         <div>
                             <label for="hallSelector">Choose a dining hall: </label>
