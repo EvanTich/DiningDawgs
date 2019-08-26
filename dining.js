@@ -18,12 +18,9 @@ var barChart;
 var lineChart;
 
 const dateSupported = (function() {
-    // thanks to chris@gomakethings.com for this snippet of code
-	let input = document.createElement('input');
-	let value = 'a';
-	input.setAttribute('type', 'date');
-	input.setAttribute('value', value);
-	return input.value !== value;
+    let test = document.createElement('input');
+    test.type = 'date';
+    return test.type !== 'text';
 })();
 
 // current time in HH:MM AM/PM format
@@ -45,11 +42,13 @@ function selectNow() {
         month = pad(now.getMonth() + 1), // 0 is jan, but our jan is 1
         day = pad(now.getDate());
 
-    dateInput.value = `${year}-${month}-${day}`;
-    
-    yearInput.value = year;
-    monthSelector.value = month;
-    daySelector.value = day;
+    if(dateSupported) {
+        dateInput.value = `${year}-${month}-${day}`;
+    } else {
+        yearInput.value = year;
+        monthSelector.value = month;
+        daySelector.value = day;
+    }
 }
 
 function get(url) {
@@ -108,10 +107,8 @@ function getLineGraphData(hall, year, month, day) {
     for(let hour in hours) {
         let mins = hours[hour];
         for(let min in mins) {
-            let date = new Date(`${year}-${month}-${day} ${hour}:${min}:00`);
-            let percent = mins[min];
-            
-            points.push({x: date, y: percent, tooltip: getTime(date)});
+            let date = new Date(year, month, day, hour, min);
+            points.push({x: date, y: mins[min], tooltip: getTime(date)});
         }
     }
     
@@ -178,7 +175,7 @@ function changedMonth() {
 function drawLabels() {
     let chart = this.chart;
     let ctx = chart.ctx;
-    ctx.font = '20px Helvetica'; // TODO find way to find dynamically
+    ctx.font = '20px Helvetica'; // this is fine
     ctx.fillStyle = 'black';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'bottom';
@@ -197,6 +194,14 @@ window.onload = () => {
         // hide date picker input, show the selectors
         document.getElementById("fallback").style.display = "";
         document.getElementById("dateSupported").style.display = "none";
+
+        // add the days on the day selector, 1 to 31
+        for(let i = 1; i < 32; i++) {
+            let option = document.createElement("option");
+            option.text = i.toString();
+            option.value = pad(i);
+            daySelector.add(option);
+        }
     }
 
     // add the halls to the hall selector
@@ -207,17 +212,8 @@ window.onload = () => {
         hallSelector.add(option);
     }
 
-    // add the days on the day selector, 1 to 31
-    for(let i = 1; i < 32; i++) {
-        let option = document.createElement("option");
-        option.text = i.toString();
-        option.value = pad(i);
-        daySelector.add(option);
-    }
-
     selectNow();
 
-    // TODO add floating label on the bars
     barChart = new Chart('barContainer', {
         type: 'bar',
         data: {
@@ -250,6 +246,7 @@ window.onload = () => {
                 enabled: true,
                 displayColors: false,
                 callbacks: {
+                    title: () => '',
                     label: (item, data) => {
                         return `${item.label}: ${item.value}%`;
                     }
@@ -358,12 +355,12 @@ window.onload = () => {
     
     update();
     
-    // wait until 5s after the last expected update (time % 5min == 0) to start updating regularly
+    // wait until 10s after the last expected update (time % 5min == 0) to start updating regularly
     const SLEEP = 300000;
     setTimeout( () => {
         // initial update
         update();
         // every other update
         setInterval(update, SLEEP);
-    }, SLEEP - (Date.now() % SLEEP) + 5000);
+    }, SLEEP - (Date.now() % SLEEP) + 10000);
 };
