@@ -128,36 +128,37 @@ function updateBarGraph() {
     barChart.update();
 }
 
-function updateLineGraph() {
-    let arr;
-    if(dateSupported && hallSelector.value == "all"){
-        let [year, month, day] = dateInput.value.split("-");
-        for (let i=0; i<5; i++){
-            arr = getLineGraphData(halls[i], year, month, day);
-            set(lineChart.data.datasets[i].data, arr);
-        }
-        lineChart.update();
-    }else{
-        if(dateSupported) {
-            for(let i=1; i<5; i++){
-                lineChart.data.datasets[i].data = [];
-            }
-            let [year, month, day] = dateInput.value.split("-");
-            arr = getLineGraphData(hallSelector.value, year, month, day);
-            set(lineChart.data.datasets[0].data, arr);
-            lineChart.update();        
-        } else {
-            for(let i=1; i<5; i++){
-                lineChart.data.datasets[i].data = [];
-            }
-            arr = getLineGraphData(hallSelector.value, yearInput.value, monthSelector.value, daySelector.value);
-            lineChart.data.datasets[i].data.hidden = true;
-            set(lineChart.data.datasets[0].data, arr);
-            lineChart.update();        
-        }
+function getHallData(hall = hallSelector.value) {
+    let year, month, day;
+    if(dateSupported) {
+        [year, month, day] = dateInput.value.split("-");
+    } else {
+        year = yearInput.value;
+        month = monthSelector.value;
+        day = daySelector.value;
     }
-    // set(lineChart.data.datasets[0].data, arr);
-    // lineChart.update();
+
+    return getLineGraphData(hall, year, month, day);
+}
+
+function updateLineGraph() {
+    if(hallSelector.value == "all") {
+        lineChart.data.datasets[0].label = halls_pretty[0];
+        lineChart.options.legend.display = true;
+        for(let i = 0; i < 5; i++) {
+            lineChart.data.datasets[i].hidden = false;
+            set(lineChart.data.datasets[i].data, getHallData(halls[i]));
+        }
+    } else {
+        lineChart.options.legend.display = false;
+        for(let i = 1; i < 5; i++) {
+            lineChart.data.datasets[i].hidden = true;
+        }
+
+        lineChart.data.datasets[0].label = halls_pretty[hallSelector.selectedIndex];
+        set(lineChart.data.datasets[0].data, getHallData());
+    }
+    lineChart.update();
 }
 
 function update() {
@@ -236,7 +237,7 @@ window.onload = () => {
     barChart = new Chart('barContainer', {
         type: 'bar',
         data: {
-            labels: [...halls_pretty.splice(0,halls_pretty.length-1)], // copy hall names to labels
+            labels: [...halls_pretty].splice(0, halls_pretty.length - 1), // copy hall names to labels
             datasets: [{
                 label: '# of Votes',
                 data: [],
@@ -305,35 +306,35 @@ window.onload = () => {
         type: 'scatter', // its a line plot, trust me
         data: {
             datasets: [{
-                label: 'Line',
+                label: halls_pretty[0],
                 showLine: true,
                 fill: false,
                 backgroundColor: 'rgba(0, 0, 255, .5)',
                 borderColor: 'rgba(0, 0, 255, .5)',
                 data: []
             },{
-                label: 'All1',
+                label: halls_pretty[1],
                 showLine: true,
                 fill: false,
                 backgroundColor: 'rgba(0, 50, 255, .5)',
                 borderColor: 'rgba(0, 50, 255, .5)',
                 data: []
             },{
-                label: 'All2',
+                label: halls_pretty[2],
                 showLine: true,
                 fill: false,
                 backgroundColor: 'rgba(50, 50, 255, .5)',
                 borderColor: 'rgba(50, 50, 255, .5)',
                 data: []
             },{
-                label: 'All3',
+                label: halls_pretty[3],
                 showLine: true,
                 fill: false,
                 backgroundColor: 'rgba(0, 175, 255, .5)',
                 borderColor: 'rgba(0, 175, 255, .5)',
                 data: []
             },{
-                label: 'All4',
+                label: halls_pretty[4],
                 showLine: true,
                 fill: false,
                 backgroundColor: 'rgba(200, 175, 255, .5)',
@@ -347,7 +348,7 @@ window.onload = () => {
                 text: 'Past Occupancy'
             },
             legend: {
-                display: false
+                display: true
             },
             elements: {
                 point: {
@@ -371,13 +372,11 @@ window.onload = () => {
                 mode: 'index',
                 displayColors: false,
                 callbacks: {
+                    title: (item, data) => {
+                        return data.datasets[item[0].datasetIndex].data[item[0].index].tooltip;
+                    },
                     label: (item, data) => {
-                        if(hallSelector.value == 'all'){
-                            return `${halls_pretty[item.datasetIndex]}: ${item.value}%`;
-                        } else{
-                            let tooltip = data.datasets[item.datasetIndex].data[item.index].tooltip;
-                            return `${tooltip}: ${item.value}%`;
-                        }
+                        return `${halls_pretty[item.datasetIndex]}: ${item.value}%`;
                     }
                 }
             },
