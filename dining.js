@@ -236,7 +236,7 @@ window.onload = () => {
     barChart = new Chart('barContainer', {
         type: 'bar',
         data: {
-            labels: [...halls_pretty], // copy hall names to labels
+            labels: [...halls_pretty.splice(0,halls_pretty.length-1)], // copy hall names to labels
             datasets: [{
                 label: '# of Votes',
                 data: [],
