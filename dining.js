@@ -1,5 +1,5 @@
-const halls = ["bolton", "ohouse", "snelling", "summit", "scott"];
-const halls_pretty = ["Bolton", "O-House", "Snelling", "Joe Frank", "The Niche"];
+const halls = ["bolton", "ohouse", "snelling", "summit", "scott", "all"];
+const halls_pretty = ["Bolton", "O-House", "Snelling", "Joe Frank", "The Niche", "All Halls"];
 
 // inputs
 const hallSelector = document.getElementById("hallSelector");
@@ -32,7 +32,7 @@ function daysInMonth(month) {
     return new Date(2019, month, 0).getDate();
 }
 
-function pad(i) {
+function pad(i) { 
     return `${i < 10 ? '0' : ''}${i}`; // pad with 0 if needed
 }
 
@@ -130,15 +130,34 @@ function updateBarGraph() {
 
 function updateLineGraph() {
     let arr;
-    if(dateSupported) {
+    if(dateSupported && hallSelector.value == "all"){
         let [year, month, day] = dateInput.value.split("-");
-        arr = getLineGraphData(hallSelector.value, year, month, day);
-    } else {
-        arr = getLineGraphData(hallSelector.value, yearInput.value, monthSelector.value, daySelector.value);
+        for (let i=0; i<5; i++){
+            arr = getLineGraphData(halls[i], year, month, day);
+            set(lineChart.data.datasets[i].data, arr);
+        }
+        lineChart.update();
+    }else{
+        if(dateSupported) {
+            for(let i=1; i<5; i++){
+                lineChart.data.datasets[i].data = [];
+            }
+            let [year, month, day] = dateInput.value.split("-");
+            arr = getLineGraphData(hallSelector.value, year, month, day);
+            set(lineChart.data.datasets[0].data, arr);
+            lineChart.update();        
+        } else {
+            for(let i=1; i<5; i++){
+                lineChart.data.datasets[i].data = [];
+            }
+            arr = getLineGraphData(hallSelector.value, yearInput.value, monthSelector.value, daySelector.value);
+            lineChart.data.datasets[i].data.hidden = true;
+            set(lineChart.data.datasets[0].data, arr);
+            lineChart.update();        
+        }
     }
-
-    set(lineChart.data.datasets[0].data, arr);
-    lineChart.update();
+    // set(lineChart.data.datasets[0].data, arr);
+    // lineChart.update();
 }
 
 function update() {
@@ -292,6 +311,34 @@ window.onload = () => {
                 backgroundColor: 'rgba(0, 0, 255, .5)',
                 borderColor: 'rgba(0, 0, 255, .5)',
                 data: []
+            },{
+                label: 'All1',
+                showLine: true,
+                fill: false,
+                backgroundColor: 'rgba(0, 50, 255, .5)',
+                borderColor: 'rgba(0, 50, 255, .5)',
+                data: []
+            },{
+                label: 'All2',
+                showLine: true,
+                fill: false,
+                backgroundColor: 'rgba(50, 50, 255, .5)',
+                borderColor: 'rgba(50, 50, 255, .5)',
+                data: []
+            },{
+                label: 'All3',
+                showLine: true,
+                fill: false,
+                backgroundColor: 'rgba(0, 175, 255, .5)',
+                borderColor: 'rgba(0, 175, 255, .5)',
+                data: []
+            },{
+                label: 'All4',
+                showLine: true,
+                fill: false,
+                backgroundColor: 'rgba(200, 175, 255, .5)',
+                borderColor: 'rgba(200, 175, 255, .5)',
+                data: []
             }]
         },
         options: {
@@ -325,8 +372,12 @@ window.onload = () => {
                 displayColors: false,
                 callbacks: {
                     label: (item, data) => {
-                        let tooltip = data.datasets[item.datasetIndex].data[item.index].tooltip;
-                        return `${tooltip}: ${item.value}%`;
+                        if(hallSelector.value == 'all'){
+                            return `${halls_pretty[item.datasetIndex]}: ${item.value}%`;
+                        } else{
+                            let tooltip = data.datasets[item.datasetIndex].data[item.index].tooltip;
+                            return `${tooltip}: ${item.value}%`;
+                        }
                     }
                 }
             },
