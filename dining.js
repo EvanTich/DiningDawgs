@@ -52,16 +52,10 @@ function selectNow() {
 }
 
 function get(url) {
-    let req = new XMLHttpRequest(); // a new request
-    req.open('GET', url, false);
-    req.send(null);
-    
-    return req.responseText;
+    return fetch(url).then(r => r.json());
 }
 
 function getBarGraphData() {
-    let actual = [];
-    
     /*
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * *
     // * Note to anybody thinking about using this data:     *
@@ -70,25 +64,27 @@ function getBarGraphData() {
     // * p.s. we only have the free version of firebase :)   *
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * *
     */
-    let lastUpdate = JSON.parse(get('https://dining-capacity.firebaseio.com/data/last_update.json'));
-    let date = new Date(lastUpdate.time * 1000);
-    // change last update box
-    lastUpdatedBox.innerHTML = `Latest Update: ${getTime(date)}`;
+    let promise = new Promise(resolve => {
+        get('https://dining-capacity.firebaseio.com/data/last_update.json').then(lastUpdate => {
+            let date = new Date(lastUpdate.time * 1000);
+            // change last update box
+            lastUpdatedBox.innerHTML = `Latest Update: ${getTime(date)}`;
 
-    for(let i = 0; i < halls.length; i++) {
-        let url = lastUpdate.url.replace('{}', halls[i]);
-        let percent = parseInt(get(url));
-        
-        // actual.push({label: halls_pretty[i], y: percent}); // may want
-        actual.push(percent);
-    }
+            let promises = [];
+            for(let i = 0; i < halls.length - 1; i++) {
+                promises.push(get(lastUpdate.url.replace('{}', halls[i]))); 
+            }
+
+            Promise.all(promises).then(actual => {
+                resolve(actual);
+            });
+        });
+    });
     
-    return actual;
+    return promise;
 }
 
 function getLineGraphData(hall, year, month, day) {
-    let points = [];
-
     /*
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * *
     // * Note to anybody thinking about using this data:     *
@@ -97,24 +93,30 @@ function getLineGraphData(hall, year, month, day) {
     // * p.s. we only have the free version of firebase :)   *
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * *
     */
-    let data = get(`https://dining-capacity.firebaseio.com/data/${hall}/${year}/${month}/${day}.json`);
-    if(data == 'null') {
-        messageBox.innerHTML = 'No data on the selected date!'; // TODO: add more info
-        return points;
-    } else messageBox.innerHTML = '';
+    let promise = new Promise(resolve => {
+        let points = [];
+        get(`https://dining-capacity.firebaseio.com/data/${hall}/${year}/${month}/${day}.json`).then(hours => {
+            if(hours == null) {
+                messageBox.innerHTML = 'No data on the selected date!'; // TODO: add more info
+                resolve(points);
+                return;
+            } else messageBox.innerHTML = '';
     
-    let hours = JSON.parse(data); // lots of hours
-    for(let hour in hours) {
-        let mins = hours[hour];
-        for(let min in mins) {
-            let date = new Date(year, month, day, hour, min);
-            points.push({x: date, y: mins[min], tooltip: getTime(date)});
-        }
-    }
+            for(let hour in hours) {
+                let mins = hours[hour];
+                for(let min in mins) {
+                    let date = new Date(year, month, day, hour, min);
+                    points.push({x: date, y: mins[min], tooltip: getTime(date)});
+                }
+            }
     
-    points.sort( (a, b) => a.x - b.x);
+            points.sort( (a, b) => a.x - b.x);
+
+            resolve(points);
+        });
+    });
     
-    return points;
+    return promise;
 }
 
 function set(dataPoints, data) {
@@ -123,12 +125,13 @@ function set(dataPoints, data) {
 }
 
 function updateBarGraph() {
-    let bar = getBarGraphData();
-    set(barChart.data.datasets[0].data, bar);
-    barChart.update();
+    getBarGraphData().then(bar => {
+        set(barChart.data.datasets[0].data, bar);
+        barChart.update();
+    });
 }
 
-function getHallData(hall = hallSelector.value) {
+function getHallData(hall, callback) {
     let year, month, day;
     if(dateSupported) {
         [year, month, day] = dateInput.value.split("-");
@@ -138,7 +141,8 @@ function getHallData(hall = hallSelector.value) {
         day = daySelector.value;
     }
 
-    return getLineGraphData(hall, year, month, day);
+    getLineGraphData(hall, year, month, day)
+        .then(callback);
 }
 
 function updateLineGraph() {
@@ -147,7 +151,10 @@ function updateLineGraph() {
         lineChart.options.legend.display = true;
         for(let i = 0; i < 5; i++) {
             lineChart.data.datasets[i].hidden = false;
-            set(lineChart.data.datasets[i].data, getHallData(halls[i]));
+            getHallData(halls[i], data => {
+                set(lineChart.data.datasets[i].data, data);
+                lineChart.update();
+            });
         }
     } else {
         lineChart.options.legend.display = false;
@@ -156,9 +163,11 @@ function updateLineGraph() {
         }
 
         lineChart.data.datasets[0].label = halls_pretty[hallSelector.selectedIndex];
-        set(lineChart.data.datasets[0].data, getHallData());
+        getHallData(hallSelector.value, data => {
+            set(lineChart.data.datasets[0].data, data);
+            lineChart.update();
+        });
     }
-    lineChart.update();
 }
 
 function update() {
@@ -296,7 +305,7 @@ window.onload = () => {
             animation: {
                 duration: 500, // in ms
                 // test with: var asda = 0; setInterval(() => {barChart.data.datasets[0].data[0] = (asda = asda % 100 + 5); barChart.update();}, 1500);
-                onProgress: drawLabels, // TODO fix jumps that happen here
+                onProgress: drawLabels,
                 onComplete: drawLabels
             }
         }

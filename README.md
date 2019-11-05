@@ -65,4 +65,7 @@ Look at [this](https://firebase.google.com/docs/database/rest/retrieve-data) for
     - doesn't matter, looks good enough
 - [ ] Fix the sudden jump for the floating labels when bar chart updates
     - Test with code snippet: `var asda = 0; setInterval(() => {barChart.data.datasets[0].data[0] = (asda = asda % 100 + 5); barChart.update();}, 1500);`
-- [ ] asyncronous get request instead of the current option
+- [x] asyncronous get request instead of the current option
+- [x] OR swap from XMLHttpRequest to fetch
+- [ ] cache line graph when first loaded and only load the rest of the graph later
+- [x] ~~?just get the data straight from uga (will only call the database once instead of five times)~~ this doesn't work
