@@ -18,7 +18,7 @@ credentials = service_account.Credentials.from_service_account_file(
 # Works the exact same way as requests!
 authed_session = AuthorizedSession(credentials)
 
-PAGE = 'https://www.cardservices.uga.edu/fs_mobile/index.php/dashboard/occupancies/'
+PAGE = 'https://apps.auxiliary.uga.edu/Dining/OccupancyCounter/api/occupancy.php'
 DATABASE = 'https://dining-capacity.firebaseio.com/data/'
 headers = {'Content-type': 'application/json'}
 
@@ -32,10 +32,11 @@ def update_data():
     page_no = time.strftime('{}/%Y/%m/%d/%H/%M.json')
     
     jsonE = requests.get(PAGE).json()
-    for hall, percent in jsonE.items():
-        do_page = page_no.format(hall)
+    for a in jsonE:
+        # example: ["Bolton", "bolton", 5]
+        do_page = page_no.format(a[1])
         
-        put(do_page, str(percent))
+        put(do_page, str(a[2]))
     
     last_update = {
         "time": current_time,
