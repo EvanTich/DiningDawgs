@@ -385,7 +385,7 @@ window.onload = () => {
                         return data.datasets[item[0].datasetIndex].data[item[0].index].tooltip;
                     },
                     label: (item, data) => {
-                        return `${halls_pretty[item.datasetIndex]}: ${item.value}%`;
+                        return `${data.datasets[item.datasetIndex].label}: ${item.value}%`;
                     }
                 }
             },
