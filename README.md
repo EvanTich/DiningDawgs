@@ -1,7 +1,7 @@
 # UGADiningCapacity
 By the by: Never ever run the setup script unless you want to delete everything in the database.
 
-Github Pages link : https://evantich.github.io/DiningDawgs/ ~~or http://diningdawgs.com~~(derelict)
+Github Pages link : https://evantich.github.io/DiningDawgs/ ~~or http://diningdawgs.com~~ (derelict)
 
 
 ## How to make the website work
