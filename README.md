@@ -1,4 +1,6 @@
-# UGADiningCapacity
+# DiningDawgs
+Provides an easy to use [website](https://evantich.github.io/DiningDawgs/) to view the capacity of all the dining halls at UGA. Includes history!
+
 By the by: Never ever run the setup script unless you want to delete everything in the database.
 
 Github Pages link : https://evantich.github.io/DiningDawgs/ ~~or http://diningdawgs.com~~ (derelict)
