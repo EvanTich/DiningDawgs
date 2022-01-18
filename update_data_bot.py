@@ -1,4 +1,4 @@
-#! /usr/bin/python3
+#!/usr/bin/python3
 import time, requests, json
 from google.oauth2 import service_account
 from google.auth.transport.requests import AuthorizedSession
@@ -28,22 +28,27 @@ def put(loc, data):
 def update_data():
     # update the data at the REST endpoint
     current_time = int(time.time())
-    
+
     page_no = time.strftime('{}/%Y/%m/%d/%H/%M.json')
-    
-    jsonE = requests.get(PAGE).json()
-    for a in jsonE:
+
+    data = requests.get(PAGE).json()
+    if not data['enabled']:
+        print('Dining counter not enabled:', data['disabledMessage'])
+        return
+
+    halls = data['diningHalls']
+    for hall, more in halls.items():
         # example: ["Bolton", "bolton", 5]
-        do_page = page_no.format(a[1])
-        
-        put(do_page, str(a[2]))
-    
+        do_page = page_no.format(hall)
+
+        put(do_page, str(more['availability']))
+
     last_update = {
         "time": current_time,
         "url": DATABASE + page_no
     }
     next_update = current_time + 300
-    
+
     put('last_update.json', json.dumps(last_update))
     put('next_update.json', str(next_update))
 
@@ -63,5 +68,8 @@ while True:
     except requests.exceptions.ConnectionError as e:
         # print("Connection error at ", int(time.time()), file=sys.stderr)
         continue
+    except requests.exceptions.RequestException as e:
+        print('HTTP/other error:', e, file=sys.stderr)
+        break
     t += SLEEP_TIME
     i += 1
