@@ -32,7 +32,7 @@ function daysInMonth(month) {
     return new Date(2019, month, 0).getDate();
 }
 
-function pad(i) { 
+function pad(i) {
     return `${i < 10 ? '0' : ''}${i}`; // pad with 0 if needed
 }
 
@@ -80,7 +80,7 @@ function getBarGraphData() {
             });
         });
     });
-    
+
     return promise;
 }
 
@@ -101,7 +101,7 @@ function getLineGraphData(hall, year, month, day) {
                 resolve(points);
                 return;
             } else messageBox.innerHTML = '';
-    
+
             for(let hour in hours) {
                 let mins = hours[hour];
                 for(let min in mins) {
@@ -109,13 +109,13 @@ function getLineGraphData(hall, year, month, day) {
                     points.push({x: date, y: mins[min], tooltip: getTime(date)});
                 }
             }
-    
+
             points.sort( (a, b) => a.x - b.x);
 
             resolve(points);
         });
     });
-    
+
     return promise;
 }
 
@@ -260,6 +260,20 @@ window.onload = () => {
                 backgroundColor: 'hsl(212, 57%, 60%)', // nice shade of blue
                 hoverBackgroundColor: 'hsl(212, 57%, 50%)',
                 borderColor: 'blue',
+                /*backgroundColor: [ // TODO see colors below
+                    'rgb()',
+                    'rgb()',
+                    'rgb()',
+                    'rgb()',
+                    'rgb()'
+                ],
+                borderColor: [
+                    'rgb()',
+                    'rgb()',
+                    'rgb()',
+                    'rgb()',
+                    'rgb()'
+                ],*/
                 borderWidth: 1
             }]
         },
@@ -300,7 +314,7 @@ window.onload = () => {
                 }]
             },
             hover: { // no tooltip animation, fixes floating labels
-                animationDuration: 0 
+                animationDuration: 0
             },
             animation: {
                 duration: 500, // in ms
@@ -318,36 +332,31 @@ window.onload = () => {
                 label: halls_pretty[0],
                 showLine: true,
                 fill: false,
-                backgroundColor: 'rgba(0, 0, 255, .5)',
-                borderColor: 'rgba(0, 0, 255, .5)',
+                borderColor: 'rgba(0, 0, 255, .5)', // TODO blue
                 data: []
             },{
                 label: halls_pretty[1],
                 showLine: true,
                 fill: false,
-                backgroundColor: 'rgba(0, 50, 255, .5)',
-                borderColor: 'rgba(0, 50, 255, .5)',
+                borderColor: 'rgba(0, 50, 255, .5)', // TODO orange
                 data: []
             },{
                 label: halls_pretty[2],
                 showLine: true,
                 fill: false,
-                backgroundColor: 'rgba(50, 50, 255, .5)',
-                borderColor: 'rgba(50, 50, 255, .5)',
+                borderColor: 'rgba(50, 50, 255, .5)', // TODO red
                 data: []
             },{
                 label: halls_pretty[3],
                 showLine: true,
                 fill: false,
-                backgroundColor: 'rgba(0, 175, 255, .5)',
-                borderColor: 'rgba(0, 175, 255, .5)',
+                borderColor: 'rgba(0, 175, 255, .5)', // TODO yellow
                 data: []
             },{
                 label: halls_pretty[4],
                 showLine: true,
                 fill: false,
-                backgroundColor: 'rgba(200, 175, 255, .5)',
-                borderColor: 'rgba(200, 175, 255, .5)',
+                borderColor: 'rgba(200, 175, 255, .5)', // TODO green
                 data: []
             }]
         },
@@ -369,10 +378,10 @@ window.onload = () => {
                 }
             },
             animation: { // no animation
-                duration: 0 
+                duration: 0
             },
             hover: { // no tooltip animation
-                animationDuration: 0 
+                animationDuration: 0
             },
             responsiveAnimationDuration: 0, // animation duration after a resize
             tooltips: {
@@ -411,9 +420,9 @@ window.onload = () => {
             }
         }
     });
-    
+
     update();
-    
+
     // wait until 10s after the last expected update (time % 5min == 0) to start updating regularly
     const SLEEP = 300000;
     setTimeout( () => {
