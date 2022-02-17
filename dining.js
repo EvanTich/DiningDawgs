@@ -1,5 +1,6 @@
 const halls = ["bolton", "ohouse", "snelling", "summit", "scott", "all"];
 const halls_pretty = ["Bolton", "O-House", "Snelling", "Joe Frank", "The Niche", "All Halls"];
+const hall_colors = ["rgb(117, 138, 255)", "rgb(237, 176, 71)", "rgb(150, 17, 17)", "rgb(255, 248, 117)", "rgb(76, 166, 97)"];
 
 // inputs
 const hallSelector = document.getElementById("hallSelector");
@@ -257,23 +258,8 @@ window.onload = () => {
                 // 	const min = 25;
                 // 	return `hsla(${value <= min ? 120 : (value >= max ? 0 : ((1 - (value - min) / (max - min)) * 120))}, 100%, 45%, 1)`;
                 // },
-                backgroundColor: 'hsl(212, 57%, 60%)', // nice shade of blue
-                hoverBackgroundColor: 'hsl(212, 57%, 50%)',
-                borderColor: 'blue',
-                /*backgroundColor: [ // TODO see colors below
-                    'rgb()',
-                    'rgb()',
-                    'rgb()',
-                    'rgb()',
-                    'rgb()'
-                ],
-                borderColor: [
-                    'rgb()',
-                    'rgb()',
-                    'rgb()',
-                    'rgb()',
-                    'rgb()'
-                ],*/
+                backgroundColor: hall_colors,
+                borderColor: hall_colors,
                 borderWidth: 1
             }]
         },
@@ -332,31 +318,31 @@ window.onload = () => {
                 label: halls_pretty[0],
                 showLine: true,
                 fill: false,
-                borderColor: 'rgba(0, 0, 255, .5)', // TODO blue
+                borderColor: hall_colors[0],
                 data: []
             },{
                 label: halls_pretty[1],
                 showLine: true,
                 fill: false,
-                borderColor: 'rgba(0, 50, 255, .5)', // TODO orange
+                borderColor: hall_colors[1],
                 data: []
             },{
                 label: halls_pretty[2],
                 showLine: true,
                 fill: false,
-                borderColor: 'rgba(50, 50, 255, .5)', // TODO red
+                borderColor: hall_colors[2],
                 data: []
             },{
                 label: halls_pretty[3],
                 showLine: true,
                 fill: false,
-                borderColor: 'rgba(0, 175, 255, .5)', // TODO yellow
+                borderColor: hall_colors[3],
                 data: []
             },{
                 label: halls_pretty[4],
                 showLine: true,
                 fill: false,
-                borderColor: 'rgba(200, 175, 255, .5)', // TODO green
+                borderColor: hall_colors[4],
                 data: []
             }]
         },
